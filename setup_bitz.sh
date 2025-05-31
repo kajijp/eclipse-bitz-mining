@@ -6,19 +6,37 @@ POOL_URL="https://mainnet-pool.powpow.app"
 BITZ_KEYPAIR="$CONFIG_PATH"
 
 install_dependencies() {
-    echo "[+] Installing Solana CLI, Anchor, Yarn, and Bitz..."
+    echo "[+] Installing required tools (Rust, Solana, Anchor, Node.js, Yarn, Bitz)..."
 
-    # Install Solana
+    # Install Rust (required for cargo)
+    if ! command -v cargo &> /dev/null; then
+        echo "[*] Installing Rust..."
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        source "$HOME/.cargo/env"
+    fi
+
+    # Install Node.js and npm
+    if ! command -v npm &> /dev/null; then
+        echo "[*] Installing Node.js and npm..."
+        curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+        apt install -y nodejs
+    fi
+
+    # Install Solana CLI
+    echo "[*] Installing Solana CLI..."
     sh -c "$(curl -sSfL https://release.solana.com/stable/install)"
     export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
 
     # Install Anchor
+    echo "[*] Installing Anchor..."
     cargo install --git https://github.com/coral-xyz/anchor anchor-cli --locked
 
     # Install Yarn
+    echo "[*] Installing Yarn..."
     npm install -g yarn
 
     # Install Bitz
+    echo "[*] Installing Bitz..."
     cargo install bitz
 
     # Generate wallet
@@ -30,6 +48,7 @@ install_dependencies() {
 
     echo "[✓] Setup complete!"
 }
+
 
 
 show_wallet() {
