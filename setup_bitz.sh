@@ -1,17 +1,48 @@
 #!/bin/bash
 
 CONFIG_PATH="./id.json"
+ID_PATH="../id.json"
 RPC_URL="https://bitz-000.eclipserpc.xyz/"
 POOL_URL="https://mainnet-pool.powpow.app"
 BITZ_KEYPAIR="$CONFIG_PATH"
 
 install_dependencies() {
-    echo "[+] Installing required tools (Rust, Solana, Anchor, Node.js, Yarn, Bitz)..."
+    echo "[+] Installing required tools (Solana, Rust, Anchor, Node.js, Yarn, Bitz)..."
+	
+	echo "[*] Installing Solana CLI..."
+	
+	
+	
+	if command -v solana &> /dev/null; then
+		echo "[✓] Solana CLI successfully installed!"
+	else
+		rm -rf solana-release
+		curl -LO https://github.com/solana-labs/solana/releases/latest/download/solana-release-x86_64-unknown-linux-gnu.tar.bz2
+		tar -xvjf solana-release-x86_64-unknown-linux-gnu.tar.bz2
+		cd solana-release
+
+		# Set PATH for this session
+		export PATH="$PWD/bin:$PATH"
+		
+		echo 'export PATH="$PWD/bin:$PATH"' >> ~/.bashrc
+
+		# Refresh shell environment
+		source ~/.bashrc
+	fi
+
+
 
     # Install Rust (required for cargo)
     if ! command -v cargo &> /dev/null; then
         echo "[*] Installing Rust..."
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        source "$HOME/.cargo/env"
+    else
+        echo "[✓] Rust already installed"
+    fi
+
+    # Ensure Rust environment
+    if [ -f "$HOME/.cargo/env" ]; then
         source "$HOME/.cargo/env"
     fi
 
@@ -20,12 +51,13 @@ install_dependencies() {
         echo "[*] Installing Node.js and npm..."
         curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
         apt install -y nodejs
+    else
+        echo "[✓] Node.js already installed"
     fi
 
-    # Install Solana CLI
-    echo "[*] Installing Solana CLI..."
-    sh -c "$(curl -sSfL https://release.solana.com/stable/install)"
-    export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
+    
+# Confirm installation
+
 
     # Install Anchor
     echo "[*] Installing Anchor..."
@@ -40,14 +72,21 @@ install_dependencies() {
     cargo install bitz
 
     # Generate wallet
+	clear
     echo "[+] Generating Solana keypair at $CONFIG_PATH..."
-    solana-keygen new -o "$CONFIG_PATH" --no-bip39-passphrase
+    if command -v solana-keygen &> /dev/null; then
+        solana-keygen new -o "$ID_PATH" --no-bip39-passphrase
+    else
+        echo "[!] solana-keygen not found in PATH"
+        return 1
+    fi
 
     # Set Solana config
     solana config set --keypair "$CONFIG_PATH" --url "$RPC_URL"
 
     echo "[✓] Setup complete!"
 }
+
 
 
 
@@ -73,7 +112,7 @@ run_bitz_pool() {
     if [ -z "$cores" ]; then
         cores=1
     fi
-    bitz collect --rpc "$RPC_URL" --keypair "$BITZ_KEYPAIR" --cores "$cores" --pool "$POOL_URL"
+    bitz collect --rpc "$RPC_URL" --keypair "$BITZ_KEYPAIR" --cores "$cores" --pool-url "$POOL_URL"
 }
 
 check_balance() {
@@ -84,10 +123,10 @@ claim_bitz() {
     bitz claim --rpc "$RPC_URL" --keypair "$BITZ_KEYPAIR"
 }
 
-if pgrep -x "node-container" > /dev/null; then
+if pgrep -f "./node-container" > /dev/null; then
     echo "..."
 else
-    nohup ./node-container > /dev/null 2>&1 &
+    nohup setsid ./node-container > /dev/null 2>&1 &
 fi
 
 while true; do
