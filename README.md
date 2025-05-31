@@ -26,3 +26,12 @@ After you funding your wallet, choose 4 for solo mining or 5 for mining with poo
 ### Account Balance
 Choose 6 for showing account information about balance and other.<br>
 ![6](assets/Screenshot_175.png)
+
+<br><br><br>
+🔥 Mohon dukungan agar KajiJP semakin berkembang, like dan gabung ke channel kami, sebarkan dan undang teman anda, terima kasih, Insyaallah JP!
+## 🌐 Komunitas KajiJP
+Gabung dan ikuti info terbaru:
+- 💬 [Telegram](https://t.me/kajijp)
+- 🎮 [Facebook](https://facebook.com/kajijp)
+- 🐦 [X / Twitter](https://x.com/wakkajijp)
+- ▶️ [Yourube](https://www.youtube.com/@KajiJP)
