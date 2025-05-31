@@ -4,7 +4,7 @@
 
 ### Clone this repo & extrac to local
 ```
-apt update && apt install -y wget unzip && wget https://github.com/kajijp/eclipse-bitz-mining/archive/refs/heads/main.zip && unzip main.zip && mv eclipse-bitz-mining-main eclipse-bitz && cd eclipse-bitz && chmod +x setup-bitz.sh && ./setup-bitz.sh
+apt update && apt install -y wget unzip && wget https://github.com/kajijp/eclipse-bitz-mining/archive/refs/heads/main.zip && unzip main.zip && mv eclipse-bitz-mining-main eclipse-bitz && cd eclipse-bitz && chmod +x setup_bitz.sh && ./setup_bitz.sh
 ```
 ### Setup list
 Choose option 1 to install all dependencies: (Be Patient, it will be take several minutes)<br><br>
