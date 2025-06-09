@@ -2,7 +2,7 @@
 
 CONFIG_PATH="./id.json"
 RPC_URL="https://bitz-000.eclipserpc.xyz/"
-POOL_URL="https://mainnet-pool.powpow.app"
+POOL_URL="stratum+tcp://enx.tw-pool.com:15005"
 BITZ_KEYPAIR="$CONFIG_PATH"
 
 install_dependencies() {
