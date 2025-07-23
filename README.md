@@ -35,5 +35,5 @@ Choose 6 for showing account information about balance and other.<br><br>
 Gabung dan ikuti info terbaru:
 - 💬 [Telegram](https://t.me/kajijp)
 - 🎮 [Facebook](https://facebook.com/kajijp)
-- 🐦 [X / Twitter](https://x.com/wakkajijp)
+- 🐦 [X / Twitter](https://x.com/kajijepe)
 - ▶️ [Yourube](https://www.youtube.com/@KajiJP)
